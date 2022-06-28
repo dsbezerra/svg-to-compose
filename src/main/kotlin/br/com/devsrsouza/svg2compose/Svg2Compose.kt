@@ -6,6 +6,7 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.MemberName
 import java.io.File
+import java.io.FilenameFilter
 import java.util.*
 
 typealias IconNameTransformer = (iconName: String, group: String) -> String
@@ -26,6 +27,7 @@ object Svg2Compose {
         outputSourceDirectory: File,
         vectorsDirectory: File,
         type: VectorType = VectorType.SVG,
+        filenameFilter: FilenameFilter = FilenameFilter { _, s -> s.equals(s) },
         iconNameTransformer: IconNameTransformer = { it, _ -> it },
         allAssetsPropertyName: String = "AllAssets"
     ): ParsingResult {
@@ -38,7 +40,7 @@ object Svg2Compose {
         vectorsDirectory.walkTopDown()
             .maxDepth(10)
             .onEnter { file ->
-                val dirIcons = file.listFiles()
+                val dirIcons = file.listFiles(filenameFilter)
                     .filter { it.isDirectory.not() }
                     .filter { it.extension.equals(type.extension, ignoreCase = true) }
 
@@ -57,7 +59,7 @@ object Svg2Compose {
 
 
                 val generatedIconsMemberNames: Map<VectorFile, MemberName> =
-                    if(dirIcons.isNotEmpty()) {
+                    if (dirIcons.isNotEmpty()) {
                         val drawables: List<Pair<File, File>> = when (type) {
                             VectorType.SVG -> dirIcons.map {
                                 val iconName = nameRelative(it).withoutExtension
@@ -107,7 +109,7 @@ object Svg2Compose {
                     childGroups = emptyList()
                 )
 
-                if(previousGroup != null) {
+                if (previousGroup != null) {
                     groupStack.pop()
                     groupStack.push(previousGroup.copy(childGroups = previousGroup.childGroups + result))
                 }
@@ -117,7 +119,7 @@ object Svg2Compose {
                 true
             }
             .onLeave {
-                val group = if(groupStack.size > 1)
+                val group = if (groupStack.size > 1)
                     groupStack.pop()
                 else
                     groupStack.peek()

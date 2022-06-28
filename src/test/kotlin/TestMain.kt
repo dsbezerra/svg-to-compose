@@ -25,6 +25,7 @@ class TestMain {
             accessorName = "Icons",
             outputSourceDirectory = destinationDir,
             vectorsDirectory = iconsDir,
+            filenameFilter = { _, name -> name.startsWith("ic_") },
             iconNameTransformer = { name, _ ->
                 name.removePrefix("ic_").toKotlinPropertyName().trim()
             },
