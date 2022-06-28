@@ -75,7 +75,7 @@ object Svg2Compose {
                         val icons: Map<VectorFile, Icon> = drawables.associate { (vectorFile, drawableFile) ->
                             vectorFile to Icon(
                                 iconNameTransformer(
-                                    drawableFile.nameWithoutExtension.toKotlinPropertyName().trim(),
+                                    drawableFile.nameWithoutExtension,
                                     groupName
                                 ),
                                 drawableFile.name,
